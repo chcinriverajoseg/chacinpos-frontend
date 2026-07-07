@@ -27,17 +27,6 @@ export default function Login() {
     setLoading(false)
   }
 
-  const loginRapido = (email, password) => {
-    setEmail(email)
-    setPassword(password)
-  }
-
-  const USUARIOS_DEMO = [
-    { nombre:'José Chacín',  email:'admin@chacinpos.cl',  password:'admin123',  rol:'Administrador' },
-    { nombre:'Ana Martínez', email:'cajera@chacinpos.cl', password:'cajero123', rol:'Cajero' },
-    { nombre:'Luis Pérez',   email:'bodega@chacinpos.cl', password:'bodega123', rol:'Bodega' },
-  ]
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -84,24 +73,6 @@ export default function Login() {
                 : 'Ingresar'}
             </button>
           </form>
-
-          <div className="mt-5 pt-5 border-t border-gray-100">
-            <p className="text-xs text-gray-400 mb-3 text-center">Acceso rápido (demo)</p>
-            <div className="space-y-2">
-              {USUARIOS_DEMO.map(u => (
-                <button key={u.email} onClick={() => loginRapido(u.email, u.password)}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 border border-gray-100 text-left transition-colors">
-                  <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center text-green-800 text-xs font-semibold">
-                    {u.nombre[0]}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{u.nombre}</p>
-                    <p className="text-xs text-gray-400">{u.rol}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
         <p className="text-center text-xs text-gray-400 mt-6">ChacinPOS v1.0 · Hecho en Chile 🇨🇱</p>
       </div>
