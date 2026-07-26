@@ -1,40 +1,64 @@
-import { useCajaStore, useInventarioStore } from '../../store/useStore'
-import { clp, calcNeto, calcIVA, fechaHora } from '../../utils/formato'
+import { useState, useEffect } from 'react'
 import { BarChart2, TrendingUp, Package, FileText } from 'lucide-react'
+import api from '../../api/axios'
+import { clp, fechaHora } from '../../utils/formato'
 
 export default function Reportes() {
-  const { ventas } = useCajaStore()
-  const { productos } = useInventarioStore()
+  const [resumen, setResumen]         = useState(null)
+  const [ventas, setVentas]           = useState([])
+  const [topProductos, setTopProductos] = useState([])
+  const [sinMovimiento, setSinMovimiento] = useState([])
+  const [cargando, setCargando]       = useState(true)
 
-  const totalVentas    = ventas.reduce((s, v) => s + v.total, 0)
-  const totalNeto      = ventas.reduce((s, v) => s + v.neto, 0)
-  const totalIva       = ventas.reduce((s, v) => s + v.iva, 0)
-  const totalUtilidad  = ventas.reduce((s, v) => s + (v.utilidad || 0), 0)
+  useEffect(() => {
+    cargarDatos()
+  }, [])
 
-  // Productos más vendidos
-  const conteoProductos = {}
-  ventas.forEach(v => {
-    v.items?.forEach(item => {
-      conteoProductos[item.nombre] = (conteoProductos[item.nombre] || 0) + (item.tipo === 'unidad' ? item.cantidad : 1)
-    })
-  })
-  const topProductos = Object.entries(conteoProductos).sort(([,a],[,b]) => b-a).slice(0,5)
+  const cargarDatos = async () => {
+    try {
+      const [reporteRes, ventasRes] = await Promise.all([
+        api.get('/ventas/reporte'),
+        api.get('/ventas'),
+      ])
+      setResumen(reporteRes.data.resumen)
+      setTopProductos(reporteRes.data.top_productos)
+      setVentas(ventasRes.data.ventas)
+    } catch (err) {
+      console.error('Error cargando reportes:', err)
+    } finally {
+      setCargando(false)
+    }
+  }
 
-  const sinMovimiento = productos.filter(p => !conteoProductos[p.nombre] && p.activo)
+  if (cargando) return (
+    <div className="flex items-center justify-center h-full">
+      <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin"/>
+    </div>
+  )
+
+  const totalVentas   = parseFloat(resumen?.total || 0)
+  const totalNeto     = parseFloat(resumen?.neto || 0)
+  const totalIva      = totalVentas - totalNeto
+  const transacciones = parseInt(resumen?.transacciones || 0)
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <h1 className="text-lg font-semibold text-gray-900">Reportes</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-gray-900">Reportes del día</h1>
+        <button onClick={cargarDatos}
+          className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50">
+          Actualizar
+        </button>
+      </div>
 
-      {/* Resumen financiero */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label:'Total ventas',   value: clp(totalVentas),   icon: TrendingUp,  color:'text-primary-600', bg:'bg-primary-50' },
-          { label:'Neto (sin IVA)', value: clp(totalNeto),    icon: BarChart2,   color:'text-blue-600',    bg:'bg-blue-50'    },
-          { label:'IVA 19%',        value: clp(totalIva),     icon: FileText,    color:'text-purple-600',  bg:'bg-purple-50'  },
-          { label:'Utilidad bruta', value: clp(totalUtilidad),icon: TrendingUp,  color:'text-green-600',   bg:'bg-green-50'   },
+          { label:'Total ventas',    value: clp(totalVentas),   icon: TrendingUp, color:'text-green-600',  bg:'bg-green-50'  },
+          { label:'Neto (sin IVA)',  value: clp(totalNeto),     icon: BarChart2,  color:'text-blue-600',   bg:'bg-blue-50'   },
+          { label:'IVA 19%',         value: clp(totalIva),      icon: FileText,   color:'text-purple-600', bg:'bg-purple-50' },
+          { label:'Transacciones',   value: transacciones,      icon: TrendingUp, color:'text-green-600',  bg:'bg-green-50'  },
         ].map(s => (
-          <div key={s.label} className="card p-4">
+          <div key={s.label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
             <div className={`w-8 h-8 ${s.bg} rounded-lg flex items-center justify-center mb-2`}>
               <s.icon size={16} className={s.color}/>
             </div>
@@ -45,25 +69,28 @@ export default function Reportes() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Últimas ventas */}
-        <div className="card overflow-hidden">
+        {/* Historial ventas */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100">
             <h2 className="text-sm font-semibold text-gray-700">Historial de ventas</h2>
           </div>
           {ventas.length === 0 ? (
-            <div className="py-12 text-center text-gray-300 text-sm">Sin ventas registradas</div>
+            <div className="py-12 text-center text-gray-300 text-sm">Sin ventas registradas hoy</div>
           ) : (
-            <div className="divide-y divide-gray-50">
-              {ventas.slice().reverse().map(v => (
+            <div className="divide-y divide-gray-50 max-h-80 overflow-y-auto">
+              {ventas.map(v => (
                 <div key={v.id} className="px-4 py-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-gray-900">
                       {v.tipo === 'factura' ? '📄' : '🧾'} Folio #{v.folio}
                     </p>
-                    <p className="text-xs text-gray-400">{fechaHora(v.fecha)} · {v.cliente?.nombre}</p>
+                    <p className="text-xs text-gray-400">
+                      {fechaHora(v.created_at)} · {v.cliente_nombre || 'Consumidor final'}
+                    </p>
+                    <p className="text-xs text-gray-400">{v.cajero || 'Cajero'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-primary-600">{clp(v.total)}</p>
+                    <p className="text-sm font-semibold text-green-600">{clp(v.total)}</p>
                     <p className="text-xs text-gray-400 capitalize">{v.tipo}</p>
                   </div>
                 </div>
@@ -72,49 +99,28 @@ export default function Reportes() {
           )}
         </div>
 
-        <div className="space-y-4">
-          {/* Top productos */}
-          <div className="card p-4">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <TrendingUp size={15} className="text-primary-600"/> Productos más vendidos
-            </h2>
-            {topProductos.length === 0 ? (
-              <p className="text-sm text-gray-300">Sin datos</p>
-            ) : (
-              <div className="space-y-2">
-                {topProductos.map(([nombre, cant], i) => (
-                  <div key={nombre} className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-gray-300 w-4">{i+1}</span>
-                    <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                      <div className="bg-primary-400 h-full rounded-full" style={{ width: `${(cant / (topProductos[0][1])) * 100}%` }}/>
-                    </div>
-                    <span className="text-sm text-gray-700 flex-1 truncate">{nombre}</span>
-                    <span className="text-xs font-semibold text-gray-500">{cant} uds</span>
+        {/* Top productos */}
+        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+          <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <TrendingUp size={15} className="text-green-600"/> Productos más vendidos hoy
+          </h2>
+          {topProductos.length === 0 ? (
+            <p className="text-sm text-gray-300">Sin datos aún</p>
+          ) : (
+            <div className="space-y-3">
+              {topProductos.map(([nombre, cant], i) => (
+                <div key={nombre} className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-gray-300 w-4">{i+1}</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                    <div className="bg-green-500 h-full rounded-full"
+                      style={{ width: `${(cant / topProductos[0]?.vendido) * 100}%` }}/>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Sin movimiento */}
-          <div className="card p-4">
-            <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <Package size={15} className="text-warn-400"/> Sin movimiento
-            </h2>
-            {sinMovimiento.length === 0 ? (
-              <p className="text-sm text-gray-300">Todos los productos se han vendido</p>
-            ) : (
-              <div className="space-y-1">
-                {sinMovimiento.slice(0,5).map(p => (
-                  <div key={p.id} className="flex items-center gap-2 text-sm">
-                    <span>{p.emoji}</span>
-                    <span className="text-gray-700">{p.nombre}</span>
-                    <span className="ml-auto badge-gray">{p.stock} uds</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <span className="text-sm text-gray-700 flex-1 truncate">{nombre}</span>
+                  <span className="text-xs font-semibold text-gray-500">{cant} uds</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
