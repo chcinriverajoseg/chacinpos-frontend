@@ -9,6 +9,7 @@ import Caja from './pages/caja/Caja'
 import Reportes from './pages/reportes/Reportes'
 import Clientes from './pages/clientes/Clientes'
 import Configuracion from './pages/config/Configuracion'
+import Usuarios from './pages/config/Usuarios'
 
 function PrivateRoute({ children }) {
   const { token } = useStore()
@@ -28,7 +29,7 @@ export default function App() {
           <Route path="caja"       element={<Caja />} />
           <Route path="reportes"   element={<Reportes />} />
           <Route path="clientes" element={<Clientes />} />
-          <Route path="config"     element={<Configuracion />} />
+          <Route path="config" element={<Usuarios />} />
         </Route>
         <Route path="*" element={<Navigate to="/pos" replace />} />
       </Routes>
