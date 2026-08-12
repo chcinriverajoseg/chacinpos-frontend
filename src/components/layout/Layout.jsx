@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { ShoppingCart, Package, DollarSign, BarChart2, Settings, LogOut, Menu, Bell, AlertTriangle, Users, LayoutDashboard, ShoppingBag } from 'lucide-react'
 import { useStore, useInventarioStore } from '../../store/useStore'
-import { getConfiguracion } from '../../api/config'
+
 
 const NAV = [
   { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
@@ -16,22 +16,13 @@ const NAV = [
 ]
 
 export default function Layout() {
-  const { sidebarOpen, toggleSidebar, user, logout, negocio, cajaAbierta, setNegocio } = useStore()
+  const { sidebarOpen, toggleSidebar, user, logout, negocio, cajaAbierta } = useStore()
   const { productos } = useInventarioStore()
   const navigate = useNavigate()
 
   const alertas = productos.filter(p => p.stock === 0 || p.stock <= p.stockMin).length
 
-  useEffect(() => {
-    getConfiguracion()
-      .then(res => setNegocio({
-        nombre: res.data.configuracion.nombre_negocio,
-        rut: res.data.configuracion.rut,
-        direccion: res.data.configuracion.direccion,
-        telefono: res.data.configuracion.telefono,
-      }))
-      .catch(() => {})
-  }, [])
+
 
   const handleLogout = () => { logout(); navigate('/login') }
 
