@@ -1,16 +1,17 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Package, DollarSign, BarChart2, Settings, LogOut, Menu, Bell, AlertTriangle, Users } from 'lucide-react'
+import { ShoppingCart, Package, DollarSign, BarChart2, Settings, LogOut, Menu, Bell, AlertTriangle, Users, LayoutDashboard } from 'lucide-react'
 import { useStore, useInventarioStore } from '../../store/useStore'
 import { getConfiguracion } from '../../api/config'
 
 const NAV = [
-  { to: '/pos',        icon: ShoppingCart, label: 'Punto de venta' },
-  { to: '/inventario', icon: Package,      label: 'Inventario' },
-  { to: '/caja',       icon: DollarSign,   label: 'Caja' },
-  { to: '/reportes',   icon: BarChart2,    label: 'Reportes' },
-  { to: '/clientes',   icon: Users,        label: 'Clientes' },
-  { to: '/config',     icon: Settings,     label: 'Configuración' },
+  { to: '/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/pos',        icon: ShoppingCart,    label: 'Punto de venta' },
+  { to: '/inventario', icon: Package,         label: 'Inventario' },
+  { to: '/caja',       icon: DollarSign,      label: 'Caja' },
+  { to: '/reportes',   icon: BarChart2,       label: 'Reportes' },
+  { to: '/clientes',   icon: Users,           label: 'Clientes' },
+  { to: '/config',     icon: Settings,        label: 'Configuración' },
 ]
 
 export default function Layout() {
