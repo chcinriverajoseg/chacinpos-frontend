@@ -31,7 +31,7 @@ export default function App() {
           <Route path="caja"       element={<Caja />} />
           <Route path="reportes"   element={<Reportes />} />
           <Route path="clientes" element={<Clientes />} />
-          <Route path="config" element={<Usuarios />} />
+          
           <Route path="compras" element={<Compras />} />
           <Route path="config" element={<Configuracion />} />
         </Route>
