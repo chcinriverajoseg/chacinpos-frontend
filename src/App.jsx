@@ -8,7 +8,7 @@ import Inventario from './pages/inventario/Inventario'
 import Caja from './pages/caja/Caja'
 import Reportes from './pages/reportes/Reportes'
 import Clientes from './pages/clientes/Clientes'
-import Configuracion from './pages/config/Configuracion'
+
 import Usuarios from './pages/config/Usuarios'
 import Compras from './pages/compras/Compras'
 
