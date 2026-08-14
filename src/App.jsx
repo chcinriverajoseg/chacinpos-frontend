@@ -12,6 +12,7 @@ import Clientes from './pages/clientes/Clientes'
 import Usuarios from './pages/config/Usuarios'
 import Compras from './pages/compras/Compras'
 import Configuracion from './pages/config/Configuracion'
+import Alertas from './pages/alertas/Alertas'
 
 function PrivateRoute({ children }) {
   const { token } = useStore()
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="caja"       element={<Caja />} />
           <Route path="reportes"   element={<Reportes />} />
           <Route path="clientes" element={<Clientes />} />
+          <Route path="alertas" element={<Alertas />} />
           
           <Route path="compras" element={<Compras />} />
           <Route path="config" element={<Configuracion />} />
