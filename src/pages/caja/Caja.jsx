@@ -7,12 +7,12 @@ import api from '../../api/axios'
 const BILLETES = [50000, 20000, 10000, 5000, 2000, 1000, 500, 100]
 
 export default function Caja() {
-  const { cajaAbierta, abrirCaja, cerrarCaja, fondoInicial } = useStore()
+  const { cajaAbierta, abrirCaja, cerrarCaja, fondoInicial, cajaId } = useStore()
   const { billetes, movimientos, ventas, resetCaja } = useCajaStore()
   const [fondoForm, setFondoForm]   = useState({})
   const [conteoReal, setConteoReal] = useState({})
   const [tab, setTab]               = useState('billetes')
-  const [turnoId, setTurnoId]       = useState(null)
+ 
   const [observaciones, setObservaciones] = useState('')
   const [arqueo, setArqueo]         = useState(null)
   const [cargando, setCargando]     = useState(false)
@@ -34,7 +34,7 @@ export default function Caja() {
         fondo_inicial: fondoTotal,
         detalle_billetes: fondoForm
       })
-      setTurnoId(res.data.turno.id)
+      
       abrirCaja(fondoTotal, res.data.turno.id)
     } catch (err) {
       alert(err.response?.data?.error || 'Error al abrir caja')
@@ -48,7 +48,7 @@ export default function Caja() {
     setCargando(true)
     try {
       const res = await api.post('/turnos/cerrar', {
-        turno_id: turnoId,
+        turno_id: cajaId,
         total_real: totalReal,
         detalle_real: conteoReal,
         observaciones

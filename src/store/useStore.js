@@ -53,7 +53,7 @@ export const useStore = create(
     }),
     {
       name: 'chacinpos-storage',
-      partialize: (s) => ({ user: s.user, token: s.token, negocio: s.negocio, cajaAbierta: s.cajaAbierta, fondoInicial: s.fondoInicial }),
+      partialize: (s) => ({ user: s.user, token: s.token, negocio: s.negocio, cajaAbierta: s.cajaAbierta, fondoInicial: s.fondoInicial, cajaId: s.cajaId }),
     }
   )
 )
