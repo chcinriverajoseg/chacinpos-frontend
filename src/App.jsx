@@ -13,6 +13,7 @@ import Usuarios from './pages/config/Usuarios'
 import Compras from './pages/compras/Compras'
 import Configuracion from './pages/config/Configuracion'
 import Alertas from './pages/alertas/Alertas'
+import DTE from './pages/dte/DTE'
 
 function PrivateRoute({ children }) {
   const { token } = useStore()
@@ -36,6 +37,7 @@ export default function App() {
           
           <Route path="compras" element={<Compras />} />
           <Route path="config" element={<Configuracion />} />
+          <Route path="dte" element={<DTE />} />
         </Route>
         <Route path="*" element={<Navigate to="/pos" replace />} />
       </Routes>

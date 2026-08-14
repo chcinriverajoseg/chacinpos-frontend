@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Package, DollarSign, BarChart2, Settings, LogOut, Menu, Bell, AlertTriangle, Users, LayoutDashboard, ShoppingBag} from 'lucide-react'
+import { ShoppingCart, Package, DollarSign, BarChart2, Settings, LogOut, Menu, Bell, AlertTriangle, Users, LayoutDashboard, ShoppingBag, FileText} from 'lucide-react'
 import { useStore, useInventarioStore } from '../../store/useStore'
 
 
@@ -14,6 +14,7 @@ const NAV = [
   { to: '/config',     icon: Settings,        label: 'Configuración' },
   { to: '/compras', icon: ShoppingBag, label: 'Compras' },
   { to: '/alertas', icon: Bell, label: 'Alertas' },
+  { to: '/dte', icon: FileText, label: 'DTE / SII' },
 ]
 
 export default function Layout() {
